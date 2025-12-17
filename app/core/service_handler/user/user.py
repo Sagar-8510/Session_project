@@ -45,11 +45,16 @@ def login_user(email,password,response):
             r.decr(count_key)
             raise HTTPException(401, f"Login limit {user.max_login} reached")
 
+        # Send session to frontend via cookie
         response.set_cookie(
-            key="session_id", value=session_id, httponly=True, samesite="lax", max_age=300
+            key="session_id",
+            value=session_id, 
+            httponly=True,
+            samesite="lax",
+            max_age=300
         )
 
         return {"Message":"Logged in"}
-    
+
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"{e}")
