@@ -1,11 +1,12 @@
 from fastapi import HTTPException
+from v1.serializers import RegisterSchema
 from v1.models import User
 from passlib.hash import bcrypt
 from .sessions import create_session
 from v1.config import r
 
 
-def create_user(user):
+def create_user(user:RegisterSchema):
     try:
         if User.objects(email=user.email).first():
             print(user.password)
@@ -38,14 +39,20 @@ def login_user(email,password,response):
 
         count_key = f"user_sessions:{user.id}"
 
-        sessions = r.incr(count_key)
-        r.expire(count_key, 300)
+        # sessions = r.incr(count_key)
+        # r.expire(count_key, 300)
+
+        
+        pipe=r.pipeline()
+        pipe.incr(count_key)
+        pipe.expire(count_key,300)
+        sessions,_=pipe.execute()
 
         if sessions > user.max_login:
             r.decr(count_key)
             raise HTTPException(401, f"Login limit {user.max_login} reached")
 
-        # Send session to frontend via cookie
+        #========== Send session to frontend via cookie ===========
         response.set_cookie(
             key="session_id",
             value=session_id, 
@@ -58,3 +65,4 @@ def login_user(email,password,response):
 
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"{e}")
+

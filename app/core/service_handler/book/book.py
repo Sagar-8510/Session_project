@@ -60,7 +60,7 @@ def fetch_book(request: Request, search: str):
         if not session:
             raise HTTPException(status_code=401, detail="Session Expired")
 
-        cache_key = "book"
+        cache_key = f"books:author:{search}"
 
         cached_data = r.get(cache_key)
 
@@ -97,8 +97,8 @@ def fetch_all_books(request: Request):
     book = Book.objects()
     if not book:
         raise HTTPException(status_code=404, detail="Not found")
-
-    return {"From_DB": book}
+    print([i.title for i in book])
+    return {"From_DB": [{"Title":i.title,"Author":i.author,"Description":i.description} for i in book]}
 
 
 # def fetch_all_books(request:Request):

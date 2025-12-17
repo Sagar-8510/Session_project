@@ -12,14 +12,22 @@ def create_session(user_id):
         userID = user_id
         expire_at = datetime.utcnow() + timedelta(minutes=5)
 
-        session_key = f"session:{session_id}"
+        # session_key = f"session:{session_id}"
 
-        session = {
-            "session_id": session_id,
-            "userID": userID,
-            "expire_at": expire_at.isoformat(),
-        }
-        r.set(session_key, json.dumps(session),ex=300)
+        # session = {
+        #     "session_id": session_id,
+        #     "userID": userID,
+        #     "expire_at": expire_at.isoformat(),
+        # }
+        # r.set(session_key, json.dumps(session),ex=300)
+
+        r.hset("sesion:{session_id}",mapping={
+            "session_id":session_id,
+            "userID":userID,
+            "expire_at":expire_at.isoformat(),
+            
+        })
+        r.expire("sesion:{session_id}", time=300)
 
         return session_id
 
@@ -33,5 +41,3 @@ def get_session(session_id):
     session=r.get(session_key)
 
     return session
-
-   
