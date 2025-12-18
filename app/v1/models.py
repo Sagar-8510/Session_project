@@ -1,18 +1,14 @@
-
-from mongoengine import Document,StringField,IntField,EmailField
+from mongoengine import Document, StringField, IntField, EmailField
 
 
 class User(Document):
-    name=StringField(required=True)
+    name = StringField(required=True)
     email = EmailField(required=True)
     password = StringField(required=True)
-    max_login=IntField(default=0)
+    max_login = IntField(default=0)
 
 
 class Book(Document):
-    title=StringField()
-    author=StringField()
-    description=StringField()
-
-
-
+    title = StringField()
+    author = StringField()
+    description = StringField()
